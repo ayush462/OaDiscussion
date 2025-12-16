@@ -1,30 +1,104 @@
 import { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import api from "../../services/api";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 export default function ResetPassword() {
   const { state } = useLocation();
+  const navigate = useNavigate();
+
   const [otp, setOtp] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // 🛡️ Safety: direct access protection
+  if (!state?.email) {
+    navigate("/forgot-password", { replace: true });
+    return null;
+  }
 
   const reset = async () => {
-    await api.post("/auth/reset-password", {
-      email: state.email,
-      otp,
-      password,
-    });
-    alert("Password reset successful");
+    if (!otp || otp.length !== 6 || !password) {
+      toast.error("OTP and new password are required");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      await api.post("/auth/reset-password", {
+        email: state.email,
+        otp,
+        password,
+      });
+
+      toast.success("Password reset successful ");
+
+      navigate("/login", { replace: true });
+    } catch (err) {
+      toast.error(
+        err.response?.data?.message ||
+          "Invalid OTP or expired request"
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="space-y-4 w-80">
-        <Input placeholder="OTP" onChange={e => setOtp(e.target.value)} />
-        <Input type="password" placeholder="New Password" onChange={e => setPassword(e.target.value)} />
-        <Button className="w-full" onClick={reset}>Reset Password</Button>
-      </div>
+ return (
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <div
+      className="
+        w-[360px]
+        border border-white/20
+        bg-card
+        shadow-[0_12px_32px_-12px_rgba(255,255,255,0.12)]
+        rounded-lg
+        p-6
+        space-y-4
+      "
+    >
+      <h2 className="text-xl font-semibold text-center text-foreground">
+        Reset Password
+      </h2>
+
+      <p className="text-sm text-center text-muted-foreground">
+        Enter the OTP sent to your email and set a new password
+      </p>
+
+      <Input
+        placeholder="6-digit OTP"
+        maxLength={6}
+        value={otp}
+        onChange={(e) =>
+          setOtp(e.target.value.replace(/\D/g, ""))
+        }
+        className="border-white/20 focus-visible:border-primary focus-visible:ring-primary/40"
+      />
+
+      <Input
+        type="password"
+        placeholder="New Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        className="border-white/20 focus-visible:border-primary focus-visible:ring-primary/40"
+      />
+
+      <Button
+        className="w-full flex items-center justify-center gap-2"
+        onClick={reset}
+        disabled={loading}
+      >
+        {loading && (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        )}
+        {loading ? "Resetting..." : "Reset Password"}
+      </Button>
     </div>
-  );
+  </div>
+);
+
 }

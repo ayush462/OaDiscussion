@@ -46,21 +46,46 @@ exports.verifyOtp = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
-  const { email, password } = req.body;
-  const user = await User.findOne({ email });
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
 
-  if (!user || !user.isVerified)
-    return res.status(400).json({ message: "Invalid credentials" });
+    if (!user)
+      return res.status(400).json({ message: "Invalid credentials" });
 
-  const ok = await bcrypt.compare(password, user.password);
-  if (!ok) return res.status(400).json({ message: "Invalid credentials" });
+    // 🚫 block google users
+    if (user.googleId) {
+      return res.status(400).json({
+        message: "This account uses Google login. Please sign in with Google.",
+      });
+    }
 
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-    expiresIn: "1d"
-  });
+    if (!user.isVerified)
+      return res.status(400).json({ message: "Please verify your email" });
 
-  res.json({ token });
+    const ok = await bcrypt.compare(password, user.password);
+    if (!ok)
+      return res.status(400).json({ message: "Invalid credentials" });
+
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    // ✅ SEND USER INFO (ONCE, CORRECTLY)
+    return res.json({
+      token,
+      role: user.role,
+      userId: user._id.toString(),
+      email: user.email,
+    });
+  } catch (err) {
+    console.error("LOGIN ERROR:", err);
+    return res.status(500).json({ message: "Login failed" });
+  }
 };
+
 
 exports.forgotPassword = async (req, res) => {
   const { email } = req.body;

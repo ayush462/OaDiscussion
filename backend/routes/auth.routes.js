@@ -1,23 +1,39 @@
 const router = require("express").Router();
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
-const ctrl = require("../controllers/auth.controller");
+const authCtrl = require("../controllers/auth.controller");
 
-router.post("/signup", ctrl.signup);
-router.post("/verify-otp", ctrl.verifyOtp);
-router.post("/login", ctrl.login);
-router.post("/forgot-password", ctrl.forgotPassword);
-router.post("/reset-password", ctrl.resetPassword);
+/* EMAIL AUTH */
+router.post("/signup", authCtrl.signup);
+router.post("/verify-otp", authCtrl.verifyOtp);
+router.post("/login", authCtrl.login);
+router.post("/forgot-password", authCtrl.forgotPassword);
+router.post("/reset-password", authCtrl.resetPassword);
 
-router.get("/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
+/* GOOGLE AUTH */
+router.get(
+  "/google",
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
+  })
 );
 
-router.get("/google/callback",
+router.get(
+  "/google/callback",
   passport.authenticate("google", { session: false }),
   (req, res) => {
-    const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET);
-    res.redirect(`http://localhost:5173/oauth-success?token=${token}`);
+    const token = jwt.sign(
+      {
+        id: req.user._id,
+        role: req.user.role,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    res.redirect(
+      `${process.env.FRONTEND_URL}/oauth-success?token=${token}&role=${req.user.role}`
+    );
   }
 );
 

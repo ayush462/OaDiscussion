@@ -8,10 +8,10 @@ const connectDB = require("./config/db");
 
 const app = express();
 
-// Connect MongoDB
+// Connect DB
 connectDB();
 
-// CORS (Vite frontend)
+// CORS
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -26,8 +26,11 @@ app.use(passport.initialize());
 
 // Routes
 app.use("/auth", require("./routes/auth.routes"));
+app.use("/api/experience", require("./routes/experience.routes"));
+app.use("/api/users", require("./routes/user.routes"));
+app.use("/api/comments", require("./routes/comment.route"));
 
 
 app.listen(5000, () => {
-  console.log(" Server running on http://localhost:5000");
+  console.log("✅ Server running on http://localhost:5000");
 });

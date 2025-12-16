@@ -5,6 +5,10 @@ const userSchema = new mongoose.Schema({
   password: String,
   googleId: String,
   isVerified: { type: Boolean, default: false },
+
+  points: { type: Number, default: 0 },
+  role: { type: String, enum: ["user", "admin"], default: "user" },
+
   createdAt: { type: Date, default: Date.now }
 });
 

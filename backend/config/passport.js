@@ -7,20 +7,36 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "/auth/google/callback"
+      callbackURL: `${process.env.BACKEND_URL}/auth/google/callback`,
     },
-    async (_, __, profile, done) => {
-      let user = await User.findOne({ googleId: profile.id });
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        const email = profile.emails[0].value;
 
-      if (!user) {
-        user = await User.create({
-          googleId: profile.id,
-          email: profile.emails[0].value,
-          isVerified: true
+        let user = await User.findOne({
+          $or: [
+            { googleId: profile.id },
+            { email }
+          ],
         });
-      }
 
-      done(null, user);
+        if (!user) {
+          user = await User.create({
+            email,
+            googleId: profile.id,
+            isVerified: true,
+          });
+        } else if (!user.googleId) {
+          // account linking
+          user.googleId = profile.id;
+          user.isVerified = true;
+          await user.save();
+        }
+
+        return done(null, user);
+      } catch (err) {
+        return done(err, null);
+      }
     }
   )
 );

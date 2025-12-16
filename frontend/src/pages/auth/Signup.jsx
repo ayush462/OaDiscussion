@@ -5,45 +5,111 @@ import { Button } from "@/components/ui/button";
 import api from "../../services/api";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
   const signup = async () => {
-    await api.post("/auth/signup", { email, password });
-    navigate("/verify-otp", { state: { email } });
+    if (!email || !password) {
+      toast.error("Email and password are required");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      await api.post("/auth/signup", { email, password });
+
+      toast.success("OTP sent to your email 📩");
+
+      navigate("/verify-otp", {
+        state: { email },
+        replace: true,
+      });
+    } catch (err) {
+      toast.error(
+        err.response?.data?.message || "Signup failed"
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 to-slate-900">
-      <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }}>
-        <Card className="w-[360px]">
-          <CardContent className="p-6 space-y-4">
-            <h2 className="text-xl font-semibold text-center">Create Account</h2>
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+    >
+      <Card
+        className="
+          w-[360px]
+          border border-white/20
+          bg-card
+          shadow-[0_12px_32px_-12px_rgba(255,255,255,0.12)]
+        "
+      >
+        <CardContent className="p-6 space-y-4">
+          <h2 className="text-xl font-semibold text-center text-foreground">
+            Create Account
+          </h2>
 
-            <Input placeholder="Email" onChange={e => setEmail(e.target.value)} />
-            <Input type="password" placeholder="Password" onChange={e => setPassword(e.target.value)} />
+          <Input
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="border-white/20 focus-visible:border-primary focus-visible:ring-primary/40"
+          />
 
-            <Button className="w-full" onClick={signup}>
-              Sign Up
-            </Button>
+          <Input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="border-white/20 focus-visible:border-primary focus-visible:ring-primary/40"
+          />
 
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => window.location.href="http://localhost:5000/auth/google"}
+          <Button
+            className="w-full flex items-center justify-center gap-2"
+            onClick={signup}
+            disabled={loading}
+          >
+            {loading && (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            )}
+            {loading ? "Creating..." : "Sign Up"}
+          </Button>
+
+          <Button
+            variant="outline"
+            className="w-full border-white/20 hover:border-primary/40"
+            onClick={() =>
+              (window.location.href =
+                "http://localhost:5000/auth/google")
+            }
+          >
+            Continue with Google
+          </Button>
+
+          <p className="text-xs text-center text-muted-foreground">
+            Already have an account?{" "}
+            <span
+              onClick={() => navigate("/login")}
+              className="underline cursor-pointer hover:text-primary"
             >
-              Continue with Google
-            </Button>
+              Login
+            </span>
+          </p>
+        </CardContent>
+      </Card>
+    </motion.div>
+  </div>
+);
 
-            <p className="text-xs text-center text-muted-foreground">
-              Already have an account? <a href="/login" className="underline">Login</a>
-            </p>
-          </CardContent>
-        </Card>
-      </motion.div>
-    </div>
-  );
 }
