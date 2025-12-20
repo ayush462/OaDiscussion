@@ -9,6 +9,7 @@ export default function OAuthSuccess() {
     const params = new URLSearchParams(window.location.search);
     const token = params.get("token");
     const role = params.get("role");
+    const email = params.get("email");
 
     if (!token) {
       navigate("/login", { replace: true });
@@ -17,6 +18,7 @@ export default function OAuthSuccess() {
 
     localStorage.setItem("token", token);
     localStorage.setItem("role", role);
+    localStorage.setItem("email",email)
 
     toast.success("Signed in with Google");
 

@@ -25,6 +25,7 @@ router.get(
     const token = jwt.sign(
       {
         id: req.user._id,
+        email: req.user.email, 
         role: req.user.role,
       },
       process.env.JWT_SECRET,
@@ -32,7 +33,7 @@ router.get(
     );
 
     res.redirect(
-      `${process.env.FRONTEND_URL}/oauth-success?token=${token}&role=${req.user.role}`
+      `${process.env.FRONTEND_URL}/oauth-success?token=${token}&role=${req.user.role}&email=${req.user.email}`
     );
   }
 );

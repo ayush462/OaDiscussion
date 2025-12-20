@@ -4,29 +4,54 @@ const Reward = require("../models/Reward");
 const User = require("../models/User");
 
 /**
- * Add comment
+ * ===============================
+ * ADD COMMENT OR REPLY
+ * ===============================
  */
 exports.addComment = async (req, res) => {
   try {
-    const { text, isAnonymous } = req.body;
+    const { text, isAnonymous, parentComment } = req.body;
     const { experienceId } = req.params;
 
-    if (!text)
+    if (!text || !text.trim()) {
       return res.status(400).json({ message: "Comment cannot be empty" });
+    }
+
+    // Validate parent comment (for replies)
+    if (parentComment) {
+      const parent = await Comment.findById(parentComment);
+      if (!parent) {
+        return res.status(404).json({ message: "Parent comment not found" });
+      }
+
+      // Only 1-level nesting (Instagram style)
+      if (parent.parentComment) {
+        return res
+          .status(400)
+          .json({ message: "Nested replies not allowed" });
+      }
+    }
 
     const comment = await Comment.create({
       text,
       experience: experienceId,
       author: req.userId,
-      isAnonymous,
+      isAnonymous: !!isAnonymous,
+      parentComment: parentComment || null,
     });
 
-    // increase comment count
-    await Experience.findByIdAndUpdate(experienceId, {
-      $inc: { commentCount: 1 },
-    });
+    // Increment counts
+    if (parentComment) {
+      await Comment.findByIdAndUpdate(parentComment, {
+        $inc: { replyCount: 1 },
+      });
+    } else {
+      await Experience.findByIdAndUpdate(experienceId, {
+        $inc: { commentCount: 1 },
+      });
+    }
 
-    // optional reward
+    // Reward system
     await Reward.create({
       user: req.userId,
       action: "COMMENT",
@@ -45,31 +70,98 @@ exports.addComment = async (req, res) => {
 };
 
 /**
- * Get comments for an experience
+ * ===============================
+ * GET COMMENTS (MOST LIKED FIRST)
+ * ===============================
  */
 exports.getComments = async (req, res) => {
   try {
     const { experienceId } = req.params;
 
-    const comments = await Comment.find({ experience: experienceId })
+    // fetch all comments
+    const all = await Comment.find({ experience: experienceId })
       .populate("author", "email role")
-      .sort({ createdAt: 1 });
+      .sort({ createdAt: 1 })
+      .lean();
 
-    res.json(comments);
+    // split parents & replies
+    const parents = all.filter((c) => !c.parentComment);
+    const replies = all.filter((c) => c.parentComment);
+
+    // map replies
+    const replyMap = {};
+    replies.forEach((r) => {
+      const pid = r.parentComment.toString();
+      if (!replyMap[pid]) replyMap[pid] = [];
+      replyMap[pid].push(r);
+    });
+
+    // attach replies
+    const result = parents.map((p) => ({
+      ...p,
+      replies: replyMap[p._id.toString()] || [],
+    }));
+
+    res.json(result);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Failed to fetch comments" });
+  }
+};
+/**
+ * ===============================
+ * LIKE / UNLIKE COMMENT
+ * ===============================
+ */
+exports.toggleLikeComment = async (req, res) => {
+  try {
+    const { commentId } = req.params;
+    const userId = req.userId;
+
+    const comment = await Comment.findById(commentId);
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
+
+    const alreadyLiked = comment.likes.some(
+      (id) => id.toString() === userId
+    );
+
+    if (alreadyLiked) {
+      await Comment.findByIdAndUpdate(commentId, {
+        $pull: { likes: userId },
+        $inc: { likeCount: -1 },
+      });
+    } else {
+      await Comment.findByIdAndUpdate(commentId, {
+        $addToSet: { likes: userId },
+        $pull: { dislikes: userId },
+        $inc: { likeCount: 1 },
+      });
+    }
+
+    res.json({
+      liked: !alreadyLiked,
+    });
+  } catch (err) {
+    console.error("LIKE COMMENT ERROR:", err);
+    res.status(500).json({ message: "Failed to like comment" });
   }
 };
 
 /**
- * Delete comment (author or admin)
+ * ===============================
+ * DELETE COMMENT (WITH REPLIES)
+ * ===============================
  */
 exports.deleteComment = async (req, res) => {
   try {
-    const comment = await Comment.findById(req.params.commentId);
+    const { commentId } = req.params;
 
-    if (!comment)
+    const comment = await Comment.findById(commentId);
+    if (!comment) {
       return res.status(404).json({ message: "Comment not found" });
+    }
 
     if (
       comment.author.toString() !== req.userId &&
@@ -78,14 +170,30 @@ exports.deleteComment = async (req, res) => {
       return res.status(403).json({ message: "Not allowed" });
     }
 
-    await Comment.findByIdAndDelete(req.params.commentId);
-
-    await Experience.findByIdAndUpdate(comment.experience, {
-      $inc: { commentCount: -1 },
+    // Delete replies first
+    const replyResult = await Comment.deleteMany({
+      parentComment: comment._id,
     });
 
-    res.json({ success: true });
+    await Comment.findByIdAndDelete(comment._id);
+
+    // Update counts
+    if (comment.parentComment) {
+      await Comment.findByIdAndUpdate(comment.parentComment, {
+        $inc: { replyCount: -1 },
+      });
+    } else {
+      await Experience.findByIdAndUpdate(comment.experience, {
+        $inc: { commentCount: -1 },
+      });
+    }
+
+    res.json({
+      success: true,
+      repliesDeleted: replyResult.deletedCount,
+    });
   } catch (err) {
+    console.error("DELETE COMMENT ERROR:", err);
     res.status(500).json({ message: "Failed to delete comment" });
   }
 };
