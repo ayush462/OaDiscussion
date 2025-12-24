@@ -43,10 +43,10 @@ export default function Profile() {
   const fetchData = async () => {
     try {
       const [profileRes, unlockRes] = await Promise.all([
-        axios.get("http://localhost:5000/api/users/me/profile", {
+        axios.get("https://oadiscussion.onrender.com/api/users/me/profile", {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        axios.get("http://localhost:5000/api/users/me/unlocks", {
+        axios.get("https://oadiscussion.onrender.com/api/users/me/unlocks", {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ]);
@@ -93,7 +93,7 @@ export default function Profile() {
 
     try {
       await axios.post(
-        "http://localhost:5000/api/shop/buy-points",
+        "https://oadiscussion.onrender.com/api/shop/buy-points",
         { pack: confirmPack.pack },
         { headers: { Authorization: `Bearer ${token}` } }
       );

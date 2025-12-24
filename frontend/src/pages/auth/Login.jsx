@@ -107,7 +107,7 @@ export default function Login() {
   className="w-full border-white/20 hover:border-primary/40 flex items-center gap-2"
   onClick={() =>
     (window.location.href =
-      "http://localhost:5000/auth/google")
+      "https://oadiscussion.onrender.com/auth/google")
   }
 >
   <GoogleIcon size={18} />

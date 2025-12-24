@@ -59,7 +59,7 @@ export default function CompareCompanies() {
       setAiSummary("");
 
       const res = await axios.get(
-        "http://localhost:5000/api/users/compare",
+        "https://oadiscussion.onrender.com/api/users/compare",
         {
           params: { companyA, companyB },
           headers: { Authorization: `Bearer ${token}` },
@@ -83,7 +83,7 @@ export default function CompareCompanies() {
       setAiLoading(true);
 
       const res = await axios.post(
-        "http://localhost:5000/api/ai/compare-summary",
+        "https://oadiscussion.onrender.com/api/ai/compare-summary",
         {
           comparison: result.comparison,
           companyA: companyA.trim().toUpperCase(),

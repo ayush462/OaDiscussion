@@ -41,7 +41,7 @@ export default function UpvoteButton({
 
     try {
       await axios.post(
-        `http://localhost:5000/api/experience/${id}/upvote`,
+        `https://oadiscussion.onrender.com/api/experience/${id}/upvote`,
         {},
         {
           headers: {

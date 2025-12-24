@@ -58,7 +58,7 @@ export default function Leaderboard() {
   useEffect(() => {
     setLoading(true);
     axios
-      .get("http://localhost:5000/api/users/leaderboard", {
+      .get("https://oadiscussion.onrender.com/api/users/leaderboard", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },

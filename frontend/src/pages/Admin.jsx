@@ -5,7 +5,7 @@ export default function Admin() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    axios.get("http://localhost:5000/api/experience/admin/reported", {
+    axios.get("https://oadiscussion.onrender.com/api/experience/admin/reported", {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
     }).then(res => setData(res.data));
   }, []);

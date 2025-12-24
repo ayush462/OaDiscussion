@@ -39,11 +39,11 @@ export default function Trending() {
     const fetchAll = async () => {
       try {
         const [trendRes, followRes] = await Promise.all([
-          axios.get("http://localhost:5000/api/experience/trending", {
+          axios.get("https://oadiscussion.onrender.com/api/experience/trending", {
             headers: { Authorization: `Bearer ${token}` },
           }),
           token
-            ? axios.get("http://localhost:5000/api/users/followed/companies", {
+            ? axios.get("https://oadiscussion.onrender.com/api/users/followed/companies", {
                 headers: { Authorization: `Bearer ${token}` },
               })
             : Promise.resolve({ data: [] }),

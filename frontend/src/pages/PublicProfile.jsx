@@ -20,7 +20,7 @@ export default function PublicProfile() {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/api/users/${id}/public`)
+      .get(`https://oadiscussion.onrender.com/api/users/${id}/public`)
       .then((res) => setProfile(res.data))
       .catch(() => {});
   }, [id]);

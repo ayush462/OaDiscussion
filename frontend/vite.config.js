@@ -16,7 +16,7 @@ export default defineConfig({
     allowedHosts: "all",      // 🔥 THIS is the key
     proxy: {
       "/api": {
-        target: "http://localhost:5000",
+        target: "https://oadiscussion.onrender.com",
         changeOrigin: true,
         secure: false,
       },

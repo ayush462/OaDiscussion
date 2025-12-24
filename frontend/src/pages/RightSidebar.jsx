@@ -22,12 +22,12 @@ const RightSidebar = memo(function RightSidebar({ mobile = false }) {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/sidebar/insights")
+      .get("https://oadiscussion.onrender.com/api/sidebar/insights")
       .then((res) => setInsights(res.data))
       .catch(() => {});
 
     axios
-      .get("http://localhost:5000/api/ai/ai-tip")
+      .get("https://oadiscussion.onrender.com/api/ai/ai-tip")
       .then((res) => setAiTip(res.data.tip))
       .catch(() => {});
   }, []);

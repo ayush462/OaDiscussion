@@ -94,7 +94,7 @@ export default function Signup() {
             className="w-full border-white/20 hover:border-primary/40"
             onClick={() =>
               (window.location.href =
-                "http://localhost:5000/auth/google")
+                "https://oadiscussion.onrender.com/auth/google")
             }
           >
             <GoogleIcon size={18} />

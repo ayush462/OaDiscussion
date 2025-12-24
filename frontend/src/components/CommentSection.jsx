@@ -46,7 +46,7 @@ export default function CommentSection({
   /* ================= FETCH ================= */
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/api/comments/${experienceId}`)
+      .get(`https://oadiscussion.onrender.com/api/comments/${experienceId}`)
       .then((res) => {
         const mapped = res.data.map(mapComment);
         setComments(mapped);
@@ -90,7 +90,7 @@ export default function CommentSection({
     setText("");
 
     const res = await axios.post(
-      `http://localhost:5000/api/comments/${experienceId}`,
+      `https://oadiscussion.onrender.com/api/comments/${experienceId}`,
       { text },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -133,7 +133,7 @@ export default function CommentSection({
     setReplyTarget(null);
 
     const res = await axios.post(
-      `http://localhost:5000/api/comments/${experienceId}`,
+      `https://oadiscussion.onrender.com/api/comments/${experienceId}`,
       { text: replyText, parentComment: parentId },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -197,7 +197,7 @@ export default function CommentSection({
     );
 
     await axios.post(
-      `http://localhost:5000/api/comments/like/${id}`,
+      `https://oadiscussion.onrender.com/api/comments/like/${id}`,
       {},
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -221,7 +221,7 @@ export default function CommentSection({
     onCommentCountChange?.((c) => Math.max(0, c - 1));
 
     await axios.delete(
-      `http://localhost:5000/api/comments/${id}`,
+      `https://oadiscussion.onrender.com/api/comments/${id}`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
   };

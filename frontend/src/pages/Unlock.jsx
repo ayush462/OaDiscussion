@@ -10,7 +10,7 @@ export default function Unlocks() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/users/me/unlocks", {
+      .get("https://oadiscussion.onrender.com/api/users/me/unlocks", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setData(res.data))

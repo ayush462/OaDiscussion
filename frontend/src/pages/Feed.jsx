@@ -114,7 +114,7 @@ export default function Feed() {
   setLoading(true);
   try {
     const res = await axios.get(
-      "http://localhost:5000/api/experience",
+      "https://oadiscussion.onrender.com/api/experience",
       {
         headers: { Authorization: `Bearer ${token}` },
         params: { limit: LIMIT },
@@ -143,7 +143,7 @@ const loadMore = async () => {
   setLoadingMore(true);
   try {
     const res = await axios.get(
-      "http://localhost:5000/api/experience",
+      "https://oadiscussion.onrender.com/api/experience",
       {
         headers: { Authorization: `Bearer ${token}` },
         params: {
@@ -206,7 +206,7 @@ useEffect(() => {
     }
 
     axios
-      .get("http://localhost:5000/api/users/followed/companies", {
+      .get("https://oadiscussion.onrender.com/api/users/followed/companies", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) =>
@@ -233,7 +233,7 @@ useEffect(() => {
       });
 
       await axios.post(
-        "http://localhost:5000/api/push/subscribe",
+        "https://oadiscussion.onrender.com/api/push/subscribe",
         sub,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -281,7 +281,7 @@ useEffect(() => {
   if (!token) return;
 
   axios.post(
-    "http://localhost:5000/api/shop/claim",
+    "https://oadiscussion.onrender.com/api/shop/claim",
     {},
     {
       headers: { Authorization: `Bearer ${token}` },
@@ -308,7 +308,7 @@ useEffect(() => {
 
     setLoading(true);
     axios
-      .get("http://localhost:5000/api/experience/filter", {
+      .get("https://oadiscussion.onrender.com/api/experience/filter", {
         headers: { Authorization: `Bearer ${token}` },
         params: backendFilters,
       })

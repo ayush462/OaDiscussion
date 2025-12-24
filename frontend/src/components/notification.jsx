@@ -66,7 +66,7 @@ export default function NotificationBell({ mobile = false }) {
     if (!token) return;
 
     const res = await axios.get(
-      "http://localhost:5000/api/notifications",
+      "https://oadiscussion.onrender.com/api/notifications",
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
@@ -92,7 +92,7 @@ export default function NotificationBell({ mobile = false }) {
   const openNotification = async (n) => {
     if (!n.isRead) {
       await axios.put(
-        `http://localhost:5000/api/notifications/${n._id}/read`,
+        `https://oadiscussion.onrender.com/api/notifications/${n._id}/read`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -110,7 +110,7 @@ export default function NotificationBell({ mobile = false }) {
 
   const markAllRead = async () => {
     await axios.put(
-      "http://localhost:5000/api/notifications/clear",
+      "https://oadiscussion.onrender.com/api/notifications/clear",
       {},
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -140,7 +140,7 @@ export default function NotificationBell({ mobile = false }) {
       setOpen(false);
 
       await axios.delete(
-        "http://localhost:5000/api/notifications/all",
+        "https://oadiscussion.onrender.com/api/notifications/all",
         { headers: { Authorization: `Bearer ${token}` } }
       );
 

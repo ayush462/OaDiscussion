@@ -23,13 +23,13 @@ export default function Bookmarks() {
       try {
         const [bookmarkRes, followRes] = await Promise.all([
           axios.get(
-            "http://localhost:5000/api/experience/bookmarks/me",
+            "https://oadiscussion.onrender.com/api/experience/bookmarks/me",
             {
               headers: { Authorization: `Bearer ${token}` },
             }
           ),
           axios.get(
-            "http://localhost:5000/api/users/followed/companies",
+            "https://oadiscussion.onrender.com/api/users/followed/companies",
             {
               headers: { Authorization: `Bearer ${token}` },
             }

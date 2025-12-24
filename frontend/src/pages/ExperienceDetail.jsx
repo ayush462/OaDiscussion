@@ -30,11 +30,11 @@ export default function ExperienceDetail() {
     const fetchAll = async () => {
       try {
         const [expRes, followRes] = await Promise.all([
-          axios.get(`http://localhost:5000/api/experience/${id}`, {
+          axios.get(`https://oadiscussion.onrender.com/api/experience/${id}`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
           axios.get(
-            "http://localhost:5000/api/users/followed/companies",
+            "https://oadiscussion.onrender.com/api/users/followed/companies",
             {
               headers: { Authorization: `Bearer ${token}` },
             }

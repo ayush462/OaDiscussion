@@ -104,7 +104,7 @@ export default function ExperienceCard({
 
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/api/comments/${exp._id}`)
+      .get(`https://oadiscussion.onrender.com/api/comments/${exp._id}`)
       .then((res) => {
         const total = res.data.reduce(
           (sum, c) => sum + 1 + (c.replies?.length || 0),
@@ -125,8 +125,8 @@ export default function ExperienceCard({
 
     try {
       const url = isFollowing
-        ? "http://localhost:5000/api/users/unfollow/company"
-        : "http://localhost:5000/api/users/follow/company";
+        ? "https://oadiscussion.onrender.com/api/users/unfollow/company"
+        : "https://oadiscussion.onrender.com/api/users/follow/company";
 
       await axios.post(
         url,
@@ -151,7 +151,7 @@ export default function ExperienceCard({
   const toggleBookmark = async () => {
     try {
       const res = await axios.post(
-        `http://localhost:5000/api/experience/${exp._id}/bookmark`,
+        `https://oadiscussion.onrender.com/api/experience/${exp._id}/bookmark`,
         {},
         {
           headers: {
@@ -211,7 +211,7 @@ export default function ExperienceCard({
       setSummaryLoading(true);
 
       const res = await axios.post(
-        "http://localhost:5000/api/ai/summarize",
+        "https://oadiscussion.onrender.com/api/ai/summarize",
         {
           text: exp.experienceText,
           topics: exp.topics,
