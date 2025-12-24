@@ -12,15 +12,16 @@ const app = express();
 
 connectDB();
 
-app.set("trust proxy", 1); // important for cookies behind proxy
+app.set("trust proxy", 1); // behind Vercel / Render proxy
 
 app.use(
   cors({
-    origin: true, // ✅ allow ALL origins (temporary)
+    origin: process.env.CLIENT_URL || "https://oa-discussion-5knr.vercel.app",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
 );
+
 
 
 app.use(express.json());
