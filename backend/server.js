@@ -12,13 +12,16 @@ const app = express();
 
 connectDB();
 
+app.set("trust proxy", 1); // important for cookies behind proxy
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: true, // ✅ allow ALL origins (temporary)
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
 );
+
 
 app.use(express.json());
 app.use(passport.initialize());
