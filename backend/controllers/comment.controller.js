@@ -3,7 +3,7 @@ const Experience = require("../models/Experience");
 const Reward = require("../models/Reward");
 const User = require("../models/User");
 const sendPush = require("../config/sendpush");
-const createNotification = require("../config/createnotification");
+const createNotification = require("../config/createNotification");
 const Notification = require("../models/inAppNotification");
 
 const AppError = require("../config/AppError");
