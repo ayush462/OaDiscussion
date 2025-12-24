@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import api from "../../services/api";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, ShieldCheck } from "lucide-react";
 
 export default function VerifyOtp() {
   const [otp, setOtp] = useState("");
@@ -15,7 +15,6 @@ export default function VerifyOtp() {
   const { state } = useLocation();
   const navigate = useNavigate();
 
-  // 🛡️ Safety: if user opens directly
   if (!state?.email) {
     navigate("/", { replace: true });
     return null;
@@ -36,7 +35,6 @@ export default function VerifyOtp() {
       });
 
       toast.success("Verification successful 🎉");
-
       navigate("/login", { replace: true });
     } catch (err) {
       toast.error(
@@ -48,43 +46,43 @@ export default function VerifyOtp() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-950">
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-      >
-        <Card className="w-[360px]">
-          <CardContent className="p-6 space-y-4">
-            <h2 className="text-lg font-semibold text-center">
-              Verify OTP
-            </h2>
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 6 }}
+      transition={{ duration: 0.22, ease: "easeOut" }}
+      className="w-full flex justify-center mt-20"
+    >
+      <Card className="w-[360px] border-border shadow-xl">
+        <CardContent className="p-6 space-y-4">
+          <div className="flex flex-col items-center gap-2">
+            <ShieldCheck className="h-8 w-8 text-primary" />
+            <h2 className="text-lg font-semibold">Verify OTP</h2>
+          </div>
 
-            <p className="text-sm text-center text-muted-foreground">
-              Sent to <span className="font-medium">{state.email}</span>
-            </p>
+          <p className="text-sm text-center text-muted-foreground">
+            Sent to <span className="font-medium">{state.email}</span>
+          </p>
 
-            <Input
-              placeholder="6-digit OTP"
-              maxLength={6}
-              value={otp}
-              onChange={(e) =>
-                setOtp(e.target.value.replace(/\D/g, ""))
-              }
-            />
+          <Input
+            placeholder="6-digit OTP"
+            maxLength={6}
+            value={otp}
+            onChange={(e) =>
+              setOtp(e.target.value.replace(/\D/g, ""))
+            }
+          />
 
-            <Button
-              className="w-full flex items-center justify-center gap-2"
-              onClick={verify}
-              disabled={loading}
-            >
-              {loading && (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              )}
-              {loading ? "Verifying..." : "Verify"}
-            </Button>
-          </CardContent>
-        </Card>
-      </motion.div>
-    </div>
+          <Button
+            className="w-full flex items-center justify-center gap-2"
+            onClick={verify}
+            disabled={loading}
+          >
+            {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+            {loading ? "Verifying..." : "Verify"}
+          </Button>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }

@@ -1,42 +1,76 @@
 import * as React from "react";
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import {
+  Link,
+  NavLink,
+  Outlet,
+  useNavigate,
+} from "react-router-dom";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
+import NotificationBell from "../components/notification.jsx";
+
 import {
-  Shield,
+  Home,
   LayoutDashboard,
+  MessageSquare,
+  Trophy,
+  Bookmark,
+  User,
+  TrendingUp,
+  BarChart3,
+  Shield,
   Users,
   FileText,
-  User,
   Menu,
+  LogOut,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
-  NavigationMenuContent,
   NavigationMenuItem,
-  NavigationMenuLink,
   NavigationMenuList,
+  NavigationMenuLink,
   NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
+  NavigationMenuContent, // ✅ IMPORTANT
 } from "@/components/ui/navigation-menu";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+
+/* ======================================================= */
+/* NAV CONFIG                                              */
+/* ======================================================= */
+
+const NAV_ITEMS = [
+  { label: "Home", to: "/", icon: Home },
+  { label: "Feed", to: "/app/feed", icon: LayoutDashboard },
+  { label: "Forum", to: "/app/forum", icon: MessageSquare },
+  { label: "Leaderboard", to: "/app/leaderboard", icon: Trophy },
+  { label: "Trending", to: "/trending", icon: TrendingUp },
+];
+
+const AUTH_ITEMS = [
+  { label: "Saved", to: "/bookmarks", icon: Bookmark },
+  { label: "Profile", to: "/app/profile", icon: User },
+  { label: "Compare", to: "/app/compare", icon: BarChart3 },
+];
+
+const ADMIN_ITEMS = [
+  { label: "Dashboard", to: "/app/admin", icon: LayoutDashboard },
+  { label: "Users", to: "/app/admin/users", icon: Users },
+  { label: "Reports", to: "/app/admin/reports", icon: FileText },
+];
+
+/* ======================================================= */
 
 export default function AppLayout() {
   const navigate = useNavigate();
 
-  const role = localStorage.getItem("role"); // "admin" | "user"
+  const role = localStorage.getItem("role");
   const email = localStorage.getItem("email");
+  const token = localStorage.getItem("token");
+
+  const isLoggedIn = Boolean(token);
 
   const logout = () => {
     localStorage.clear();
@@ -45,17 +79,16 @@ export default function AppLayout() {
   };
 
   return (
-    <div className="min-h-screen">
-      {/* NAVBAR */}
+    <div className="min-h-screen w-full">
+      {/* ================= NAVBAR ================= */}
       <motion.nav
-        initial={{ y: -20, opacity: 0 }}
+        initial={{ y: -16, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.35 }}
-        className="border-b bg-background/80 backdrop-blur"
+        transition={{ duration: 0.3 }}
+        className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur"
       >
         <div className="mx-auto flex max-w-7xl items-center px-4 py-3">
-
-          {/* MOBILE HAMBURGER */}
+          {/* MOBILE LEFT */}
           <div className="md:hidden">
             <Sheet>
               <SheetTrigger asChild>
@@ -66,6 +99,7 @@ export default function AppLayout() {
 
               <SheetContent side="left" className="bg-card">
                 <MobileNav
+                  isLoggedIn={isLoggedIn}
                   role={role}
                   email={email}
                   logout={logout}
@@ -74,55 +108,36 @@ export default function AppLayout() {
             </Sheet>
           </div>
 
+          {/* MOBILE RIGHT */}
+          <div className="ml-auto md:hidden">
+            {isLoggedIn && <NotificationBell mobile />}
+          </div>
+
           {/* DESKTOP NAV */}
           <div className="hidden md:flex w-full items-center">
             <NavigationMenu>
-              <NavigationMenuList className="gap-2">
-                <NavLink to="/">Home</NavLink>
-                <NavLink to="/app/feed">Feed</NavLink>
-                <NavLink to="/app/forum">Forum</NavLink>
+              <NavigationMenuList className="gap-1">
+                {NAV_ITEMS.map((item) => (
+                  <DesktopNavItem key={item.to} {...item} />
+                ))}
 
-                {/* Leaderboard */}
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger>
-                    Leaderboard
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className="grid w-[220px] gap-3 p-4">
-                      <NavItem to="/app/leaderboard">Global</NavItem>
-                      <NavItem to="/app/leaderboard/week">This Week</NavItem>
-                      <NavItem to="/app/leaderboard/month">This Month</NavItem>
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
+                {isLoggedIn &&
+                  AUTH_ITEMS.map((item) => (
+                    <DesktopNavItem key={item.to} {...item} />
+                  ))}
 
-                {/* Admin */}
                 {role === "admin" && (
                   <NavigationMenuItem>
                     <NavigationMenuTrigger className="flex items-center gap-2">
-                      <Shield className="h-4 w-4 text-muted-foreground" />
+                      <Shield className="h-4 w-4" />
                       Admin
                     </NavigationMenuTrigger>
+
                     <NavigationMenuContent>
-                      <ul className="grid w-[240px] gap-2 p-3">
-                        <AdminItem
-                          to="/app/admin"
-                          icon={LayoutDashboard}
-                          title="Dashboard"
-                          desc="Overview & metrics"
-                        />
-                        <AdminItem
-                          to="/app/admin/users"
-                          icon={Users}
-                          title="Users"
-                          desc="Manage platform users"
-                        />
-                        <AdminItem
-                          to="/app/admin/reports"
-                          icon={FileText}
-                          title="Reports"
-                          desc="Moderation & logs"
-                        />
+                      <ul className="grid w-[220px] gap-1 p-2">
+                        {ADMIN_ITEMS.map((item) => (
+                          <AdminItem key={item.to} {...item} />
+                        ))}
                       </ul>
                     </NavigationMenuContent>
                   </NavigationMenuItem>
@@ -132,39 +147,46 @@ export default function AppLayout() {
 
             {/* RIGHT SIDE */}
             <div className="ml-auto flex items-center gap-4">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex items-center gap-2 rounded-md px-3 py-1.5 hover:bg-accent cursor-pointer">
-                    <User className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm  font-medium">
-                      {email}
-                    </span>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" align="end">
-                  <p className="text-xs">{email}</p>
-                  {role === "admin" && (
-                    <p className="text-xs text-muted-foreground">
-                      Admin
-                    </p>
-                  )}
-                </TooltipContent>
-              </Tooltip>
+              {isLoggedIn ? (
+                <>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center gap-2 rounded-md px-3 py-1.5 hover:bg-accent cursor-pointer">
+                        <User className="h-4 w-4" />
+                        <span className="text-sm truncate max-w-[180px]">
+                          {email}
+                        </span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" align="end">
+                      <p className="text-xs">{email}</p>
+                      {role === "admin" && (
+                        <p className="text-xs text-muted-foreground">Admin</p>
+                      )}
+                    </TooltipContent>
+                  </Tooltip>
 
-              <Button variant="outline" onClick={logout}>
-                Logout
-              </Button>
+                  <NotificationBell />
+
+                  <Button variant="outline" size="sm" onClick={logout}>
+                    <LogOut className="h-4 w-4 mr-1" />
+                    Logout
+                  </Button>
+                </>
+              ) : (
+                <Button onClick={() => navigate("/login")}>Login</Button>
+              )}
             </div>
           </div>
         </div>
       </motion.nav>
 
-      {/* PAGE CONTENT */}
+      {/* ================= CONTENT ================= */}
       <motion.main
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.15 }}
-        className="mx-auto max-w-7xl p-4"
+        transition={{ delay: 0.1 }}
+        className="w-full px-3 sm:px-4 pt-4 sm:pt-6 sm:max-w-7xl sm:mx-auto"
       >
         <Outlet />
       </motion.main>
@@ -172,103 +194,118 @@ export default function AppLayout() {
   );
 }
 
-/* ---------------- HELPERS ---------------- */
+/* ======================================================= */
+/* DESKTOP NAV ITEM                                        */
+/* ======================================================= */
 
-function NavLink({ to, children }) {
+function DesktopNavItem({ to, label, icon: Icon }) {
   return (
     <NavigationMenuItem>
-      <NavigationMenuLink
-        asChild
-        className={navigationMenuTriggerStyle()}
-      >
-        <Link to={to}>{children}</Link>
+      <NavigationMenuLink asChild>
+        <NavLink
+          to={to}
+          className={({ isActive }) =>
+            `
+            flex flex-row items-center justify-center gap-2
+            px-4 py-2 rounded-md text-sm font-medium
+            transition-colors whitespace-nowrap
+            ${
+              isActive
+                ? "bg-green-500/15 text-white dark:text-green-400 shadow-[0_0_0_1px_rgba(34,197,94,0.35)]"
+                : "text-muted-foreground hover:bg-accent hover:text-foreground"
+            }
+          `
+          }
+        >
+          <Icon className="h-4 w-4 shrink-0" />
+          <span className="leading-none">{label}</span>
+        </NavLink>
       </NavigationMenuLink>
     </NavigationMenuItem>
   );
 }
 
-function NavItem({ to, children }) {
+/* ======================================================= */
+/* ADMIN ITEM                                              */
+/* ======================================================= */
+
+function AdminItem({ to, label, icon: Icon }) {
   return (
-    <li>
-      <NavigationMenuLink asChild>
-        <Link
-          to={to}
-          className="block rounded-md p-2 text-sm font-medium hover:bg-accent"
-        >
-          {children}
-        </Link>
-      </NavigationMenuLink>
-    </li>
+    <NavigationMenuLink asChild>
+      <Link
+        to={to}
+        className="flex items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-accent"
+      >
+        <Icon className="h-4 w-4" />
+        {label}
+      </Link>
+    </NavigationMenuLink>
   );
 }
 
-function AdminItem({ to, icon: Icon, title, desc }) {
-  return (
-    <li>
-      <NavigationMenuLink asChild>
-        <Link
-          to={to}
-          className="flex gap-3 rounded-md p-2 hover:bg-accent"
-        >
-          <Icon className="mt-0.5 h-4 w-4 text-muted-foreground" />
-          <div>
-            <div className="text-sm font-medium">{title}</div>
-            <div className="text-xs text-muted-foreground">
-              {desc}
-            </div>
-          </div>
-        </Link>
-      </NavigationMenuLink>
-    </li>
-  );
-}
+/* ======================================================= */
+/* MOBILE NAV                                              */
+/* ======================================================= */
 
-function MobileNav({ role, email, logout }) {
+function MobileNav({ isLoggedIn, role, email, logout }) {
   return (
     <div className="flex h-full flex-col gap-6">
-      <div>
-        <p className="text-xs text-muted-foreground">
-          Signed in as
-        </p>
-        <p className="font-medium">{email}</p>
-      </div>
+      {isLoggedIn && (
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-500/15 text-green-600 dark:text-green-400">
+            <User className="h-5 w-5" />
+          </div>
+          <div className="text-sm font-medium truncate">{email}</div>
+        </div>
+      )}
 
-      <nav className="flex flex-col gap-2">
-        <MobileLink to="/">Home</MobileLink>
-        <MobileLink to="/app/feed">Feed</MobileLink>
-        <MobileLink to="/app/forum">Forum</MobileLink>
-        <MobileLink to="/app/leaderboard">Leaderboard</MobileLink>
+      <nav className="flex flex-col gap-1">
+        {NAV_ITEMS.map((item) => (
+          <MobileNavItem key={item.to} {...item} />
+        ))}
+
+        {isLoggedIn &&
+          AUTH_ITEMS.map((item) => (
+            <MobileNavItem key={item.to} {...item} />
+          ))}
 
         {role === "admin" && (
           <>
-            <p className="mt-4 text-xs text-muted-foreground uppercase">
+            <p className="mt-3 text-xs uppercase text-muted-foreground">
               Admin
             </p>
-            <MobileLink to="/app/admin">Dashboard</MobileLink>
-            <MobileLink to="/app/admin/users">Users</MobileLink>
-            <MobileLink to="/app/admin/reports">Reports</MobileLink>
+            {ADMIN_ITEMS.map((item) => (
+              <MobileNavItem key={item.to} {...item} />
+            ))}
           </>
         )}
       </nav>
 
-      <Button
-        variant="outline"
-        className="mt-auto"
-        onClick={logout}
-      >
-        Logout
-      </Button>
+      {isLoggedIn ? (
+        <Button variant="outline" className="mt-auto" onClick={logout}>
+          <LogOut className="h-4 w-4 mr-2" />
+          Logout
+        </Button>
+      ) : (
+        <Button
+          className="mt-auto"
+          onClick={() => (window.location.href = "/login")}
+        >
+          Login
+        </Button>
+      )}
     </div>
   );
 }
 
-function MobileLink({ to, children }) {
+function MobileNavItem({ to, label, icon: Icon }) {
   return (
     <Link
       to={to}
-      className="rounded-md px-3 py-2 text-sm font-medium hover:bg-accent"
+      className="flex items-center gap-3 rounded-md px-3 py-2 text-sm hover:bg-accent"
     >
-      {children}
+      <Icon className="h-4 w-4" />
+      {label}
     </Link>
   );
 }

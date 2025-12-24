@@ -11,6 +11,9 @@ export default defineConfig({
     },
   },
   server: {
+    host: true,               // REQUIRED
+    strictPort: true,
+    allowedHosts: "all",      // 🔥 THIS is the key
     proxy: {
       "/api": {
         target: "http://localhost:5000",

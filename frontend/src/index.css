@@ -75,6 +75,48 @@
   scrollbar-color: rgba(148,163,184,.5) transparent;
 }
 
+/* ================= HOVER SCROLLBAR (PREMIUM UX) ================= */
+
+.hover-scrollbar {
+  scrollbar-width: none;          /* Firefox */
+  -ms-overflow-style: none;       /* IE / Edge */
+}
+
+.hover-scrollbar::-webkit-scrollbar {
+  width: 0px;
+}
+
+.hover-scrollbar:hover::-webkit-scrollbar {
+  width: 6px;
+}
+
+.hover-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(148, 163, 184, 0.45); /* slate-400 */
+  border-radius: 999px;
+}
+
+.hover-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Fix shadcn AlertDialog overlay stacking */
+[data-radix-alert-dialog-overlay] {
+  z-index: 1999 !important;
+}
+
+
+
+
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+
 
 :root {
   --radius: 0.625rem;

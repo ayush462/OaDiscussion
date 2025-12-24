@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import GoogleIcon from "@/services/googleIcon";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
@@ -42,10 +43,13 @@ export default function Signup() {
   };
 
   return (
-  <div className="min-h-screen flex items-center justify-center bg-background">
+    // ✅ SIMPLE ROOT — AppLayout handles centering
     <motion.div
-      initial={{ opacity: 0, y: 40 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 6 }}
+      transition={{ duration: 0.22, ease: "easeOut" }}
+      className="w-full flex justify-center mt-20"
     >
       <Card
         className="
@@ -56,7 +60,7 @@ export default function Signup() {
         "
       >
         <CardContent className="p-6 space-y-4">
-          <h2 className="text-xl font-semibold text-center text-foreground">
+          <h2 className="text-xl font-semibold text-center">
             Create Account
           </h2>
 
@@ -80,12 +84,11 @@ export default function Signup() {
             onClick={signup}
             disabled={loading}
           >
-            {loading && (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            )}
+            {loading && <Loader2 className="h-4 w-4 animate-spin" />}
             {loading ? "Creating..." : "Sign Up"}
           </Button>
 
+          {/* GOOGLE SIGNUP */}
           <Button
             variant="outline"
             className="w-full border-white/20 hover:border-primary/40"
@@ -94,6 +97,7 @@ export default function Signup() {
                 "http://localhost:5000/auth/google")
             }
           >
+            <GoogleIcon size={18} />
             Continue with Google
           </Button>
 
@@ -109,7 +113,5 @@ export default function Signup() {
         </CardContent>
       </Card>
     </motion.div>
-  </div>
-);
-
+  );
 }

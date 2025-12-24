@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"; // 👈 add useEffect
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -6,7 +6,9 @@ import api from "../../services/api";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2} from "lucide-react";
+import GoogleIcon from "@/services/googleIcon";
+
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -15,14 +17,12 @@ export default function Login() {
 
   const navigate = useNavigate();
 
-  // ✅ ADD THIS BLOCK
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       navigate("/app/feed", { replace: true });
     }
   }, [navigate]);
-  // ✅ END
 
   const login = async () => {
     if (!email || !password) {
@@ -36,10 +36,9 @@ export default function Login() {
       const res = await api.post("/auth/login", { email, password });
 
       localStorage.setItem("token", res.data.token);
-  localStorage.setItem("role", res.data.role);
-  localStorage.setItem("userId", res.data.userId);
-  localStorage.setItem("email", res.data.email);
-
+      localStorage.setItem("role", res.data.role);
+      localStorage.setItem("userId", res.data.userId);
+      localStorage.setItem("email", res.data.email);
 
       toast.success("Login successful");
 
@@ -57,11 +56,13 @@ export default function Login() {
   };
 
   return (
-   
-  <div className="min-h-screen flex items-center justify-center bg-background">
+    // ✅ SIMPLE ROOT — AppLayout handles centering
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 6 }}
+      transition={{ duration: 0.22, ease: "easeOut" }}
+      className="w-full flex justify-center mt-20"
     >
       <Card
         className="
@@ -72,7 +73,7 @@ export default function Login() {
         "
       >
         <CardContent className="p-6 space-y-4">
-          <h2 className="text-xl font-semibold text-center text-foreground">
+          <h2 className="text-xl font-semibold text-center">
             Login
           </h2>
 
@@ -96,23 +97,22 @@ export default function Login() {
             onClick={login}
             disabled={loading}
           >
-            {loading && (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            )}
+            {loading && <Loader2 className="h-4 w-4 animate-spin" />}
             {loading ? "Logging in..." : "Login"}
           </Button>
 
           {/* GOOGLE LOGIN */}
           <Button
-            variant="outline"
-            className="w-full border-white/20 hover:border-primary/40"
-            onClick={() =>
-              (window.location.href =
-                "http://localhost:5000/auth/google")
-            }
-          >
-            Continue with Google
-          </Button>
+  variant="outline"
+  className="w-full border-white/20 hover:border-primary/40 flex items-center gap-2"
+  onClick={() =>
+    (window.location.href =
+      "http://localhost:5000/auth/google")
+  }
+>
+  <GoogleIcon size={18} />
+  Continue with Google
+</Button>
 
           <p className="text-xs text-center text-muted-foreground">
             <span
@@ -122,18 +122,18 @@ export default function Login() {
               Forgot password?
             </span>
           </p>
+
           <p className="text-xs text-center text-muted-foreground">
-  Don&apos;t have an account?{" "}
-  <span
-    className="cursor-pointer underline hover:text-primary"
-    onClick={() => navigate("/signup")}
-  >
-    Sign up
-  </span>
-</p>
+            Don&apos;t have an account?{" "}
+            <span
+              className="cursor-pointer underline hover:text-primary"
+              onClick={() => navigate("/signup")}
+            >
+              Sign up
+            </span>
+          </p>
         </CardContent>
       </Card>
     </motion.div>
-  </div>
-);
+  );
 }

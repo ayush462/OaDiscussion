@@ -47,10 +47,19 @@ const experienceSchema = new mongoose.Schema(
 
     upvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     reports: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    bookmarks: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    // add below bookmarks
+usedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+
+// derived, not stored
+// helpedCount = bookmarks.length + usedBy.length
+
+
 
     commentCount: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
+experienceSchema.index({ createdAt: -1 });
 
 module.exports = mongoose.model("Experience", experienceSchema);

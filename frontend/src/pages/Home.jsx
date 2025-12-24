@@ -42,7 +42,13 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background overflow-hidden">
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 6 }}
+      transition={{ duration: 0.22, ease: "easeOut" }}
+      className="min-h-screen bg-background overflow-hidden"
+    >
       {/* HERO */}
       <section className="relative mx-auto max-w-6xl px-6 pt-28 pb-20">
         <div className="absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-primary/20 blur-3xl" />
@@ -170,7 +176,7 @@ export default function Home() {
           </Button>
         </motion.div>
       </section>
-    </div>
+    </motion.div>
   );
 }
 
