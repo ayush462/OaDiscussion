@@ -16,7 +16,7 @@ import Admin from "./pages/Admin";
 import Forum from "./pages/Forum";
 import Home from "./pages/Home";
 import Bookmarks from "./pages/Bookmark";
-import Trending from "./pages/trending";
+import Trending from "./pages/Trending";
 import ExperienceDetail from "./pages/ExperienceDetail";
 import Profile from "./pages/userProfile";
 import CompareCompanies from "./pages/companyCompare";
