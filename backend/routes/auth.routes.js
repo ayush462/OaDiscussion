@@ -32,10 +32,17 @@ router.get(
       { expiresIn: "1d" }
     );
 
-    res.redirect(
-      `${process.env.FRONTEND_URL}/oauth-success?token=${token}&role=${req.user.role}&email=${req.user.email}`
-    );
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,        // REQUIRED on Render (HTTPS)
+      sameSite: "none",    // REQUIRED for Vercel ↔ Render
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    // ✅ Redirect WITHOUT token in URL
+    res.redirect(`${process.env.FRONTEND_URL}/oauth-success`);
   }
+
 );
 
 module.exports = router;

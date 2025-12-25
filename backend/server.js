@@ -3,6 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const passport = require("passport");
+const cookieParser = require("cookie-parser");
 
 require("./config/passport");
 const connectDB = require("./config/db");
@@ -16,15 +17,17 @@ app.set("trust proxy", 1); // behind Vercel / Render proxy
 
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "https://oa-discussion-5knr.vercel.app",
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: process.env.FRONTEND_URL, // ❌ NOT "*"
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
 
 
 app.use(express.json());
+app.use(cookieParser());
 app.use(passport.initialize());
 
 app.use("/auth", require("./routes/auth.routes"));
