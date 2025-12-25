@@ -16,7 +16,7 @@ app.set("trust proxy", 1); // behind Vercel / Render proxy
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "https://oa-discussion-5knr.vercel.app",
+    origin: process.env.FRONTEND_URL || "https://oa-discussion-5knr.vercel.app",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
