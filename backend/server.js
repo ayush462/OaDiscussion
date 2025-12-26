@@ -3,7 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const passport = require("passport");
-const cookieParser = require("cookie-parser");
+
 
 require("./config/passport");
 const connectDB = require("./config/db");
@@ -27,7 +27,6 @@ app.use(
 
 
 app.use(express.json());
-app.use(cookieParser());
 app.use(passport.initialize());
 
 app.use("/auth", require("./routes/auth.routes"));
