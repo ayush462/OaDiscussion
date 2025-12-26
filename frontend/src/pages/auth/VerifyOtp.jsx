@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,14 +11,20 @@ import { Loader2, ShieldCheck } from "lucide-react";
 export default function VerifyOtp() {
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [cooldown, setCooldown] = useState(30);
 
   const { state } = useLocation();
   const navigate = useNavigate();
 
-  if (!state?.email) {
-    navigate("/", { replace: true });
-    return null;
-  }
+  // 🛡️ Direct access protection
+  useEffect(() => {
+    if (!state?.email) {
+      navigate("/", { replace: true });
+    }
+  }, [state, navigate]);
+
+  /* ================= VERIFY OTP ================= */
 
   const verify = async () => {
     if (!otp || otp.length !== 6) {
@@ -34,7 +40,7 @@ export default function VerifyOtp() {
         otp,
       });
 
-      toast.success("Verification successful 🎉");
+      toast.success("Email verified successfully 🎉");
       navigate("/login", { replace: true });
     } catch (err) {
       toast.error(
@@ -44,6 +50,41 @@ export default function VerifyOtp() {
       setLoading(false);
     }
   };
+
+  /* ================= RESEND OTP ================= */
+
+  const resendOtp = async () => {
+    try {
+      setResending(true);
+
+      await api.post("/auth/resend-otp", {
+        email: state.email,
+      });
+
+      toast.success("OTP resent to your email 📩");
+      setCooldown(30);
+    } catch (err) {
+      toast.error(
+        err.response?.data?.message || "Failed to resend OTP"
+      );
+    } finally {
+      setResending(false);
+    }
+  };
+
+  /* ================= COOLDOWN TIMER ================= */
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+
+    const timer = setInterval(() => {
+      setCooldown((c) => c - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [cooldown]);
+
+  /* ================= UI ================= */
 
   return (
     <motion.div
@@ -61,7 +102,7 @@ export default function VerifyOtp() {
           </div>
 
           <p className="text-sm text-center text-muted-foreground">
-            Sent to <span className="font-medium">{state.email}</span>
+            Sent to <span className="font-medium">{state?.email}</span>
           </p>
 
           <Input
@@ -81,6 +122,23 @@ export default function VerifyOtp() {
             {loading && <Loader2 className="h-4 w-4 animate-spin" />}
             {loading ? "Verifying..." : "Verify"}
           </Button>
+
+          {/* RESEND OTP */}
+          <div className="text-center text-sm">
+            {cooldown > 0 ? (
+              <span className="text-muted-foreground">
+                Resend OTP in {cooldown}s
+              </span>
+            ) : (
+              <button
+                onClick={resendOtp}
+                disabled={resending}
+                className="text-primary hover:underline disabled:opacity-50"
+              >
+                {resending ? "Resending..." : "Resend OTP"}
+              </button>
+            )}
+          </div>
         </CardContent>
       </Card>
     </motion.div>

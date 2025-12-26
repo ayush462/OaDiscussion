@@ -9,6 +9,8 @@ router.post("/verify-otp", authCtrl.verifyOtp);
 router.post("/login", authCtrl.login);
 router.post("/forgot-password", authCtrl.forgotPassword);
 router.post("/reset-password", authCtrl.resetPassword);
+router.post("/resend-otp", authCtrl.resendOtp);
+
 
 /* GOOGLE AUTH */
 router.get(

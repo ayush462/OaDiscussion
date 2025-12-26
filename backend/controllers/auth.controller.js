@@ -76,6 +76,8 @@ const sendOtp = async (email, otp) => {
 };
 
 
+
+
 const generateOtp = () =>
   Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -179,6 +181,49 @@ exports.login = catchAsync(async (req, res) => {
     email: user.email,
   });
 });
+/* ================= RESEND OTP ================= */
+
+exports.resendOtp = catchAsync(async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    throw new AppError("Email is required", 400);
+  }
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    // 🔐 prevent enumeration
+    return res.json({ message: "OTP sent" });
+  }
+
+  if (user.isVerified) {
+    return res.json({ message: "Email already verified" });
+  }
+
+  // ⏱️ simple cooldown: prevent spam (30s)
+  const recentOtp = await Otp.findOne({
+    email,
+    expiresAt: { $gt: new Date(Date.now() + 4.5 * 60000) },
+  });
+
+  if (recentOtp) {
+    throw new AppError("Please wait before requesting a new OTP", 429);
+  }
+
+  const otp = generateOtp();
+  await Otp.deleteMany({ email });
+
+  await Otp.create({
+    email,
+    otp,
+    expiresAt: new Date(Date.now() + 5 * 60000),
+  });
+
+  await sendOtp(email, otp);
+
+  res.json({ message: "OTP resent" });
+});
+
 
 /* ================= FORGOT PASSWORD ================= */
 

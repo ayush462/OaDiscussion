@@ -27,7 +27,7 @@ export default function Signup() {
 
       await api.post("/auth/signup", { email, password });
 
-      toast.success("OTP sent to your email 📩");
+      toast.success("OTP sent to your email ");
 
       navigate("/verify-otp", {
         state: { email },
