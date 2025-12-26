@@ -3,21 +3,21 @@ const User = require("../models/User");
 
 module.exports = async (req, res, next) => {
   try {
-    // ✅ 1. Read token from COOKIE first, then HEADER
-    const token =
-      req.cookies?.token ||
-      req.headers.authorization?.split(" ")[1];
+    // ✅ Read token ONLY from Authorization header
+    const authHeader = req.headers.authorization;
 
-    if (!token) {
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    // ✅ 2. Verify token
+    const token = authHeader.split(" ")[1];
+
+    // ✅ Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     req.userId = decoded.id;
 
-    // ✅ 3. Get role (needed for admin routes)
+    // ✅ Attach role (for admin routes)
     const user = await User.findById(decoded.id).select("role");
     req.userRole = user?.role || "user";
 
