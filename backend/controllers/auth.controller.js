@@ -11,8 +11,7 @@ const logoPath = require("path").join(__dirname, "../../logo.png");
 /* ================= HELPERS ================= */
 
 const sendOtp = async (email, otp) => {
-  await mailer.sendMail({
-    from: '"OaDiscuss" <no-reply@oadiscuss.com>',
+  await mailer({
     to: email,
     subject: "Your OaDiscuss OTP Code",
     html: `
@@ -37,7 +36,7 @@ const sendOtp = async (email, otp) => {
           <!-- Body -->
           <div style="padding:28px;color:#e5e7eb">
             <p style="margin:0 0 14px;font-size:15px">
-              Hey 
+              Hey
             </p>
 
             <p style="margin:0 0 20px;font-size:15px;line-height:1.6">
