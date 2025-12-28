@@ -4,7 +4,7 @@ const admin = require("../middleware/admin");
 const ctrl = require("../controllers/experience.controller");
 
 router.post("/", auth, ctrl.createExperience);
-router.get("/", ctrl.getExperiences);
+router.get("/",auth, ctrl.getExperiences);
 
 router.get("/filter", auth, ctrl.filterExperiences);
 router.get("/trending", auth, ctrl.getTrendingExperiences);

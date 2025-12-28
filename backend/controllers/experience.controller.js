@@ -123,10 +123,7 @@ exports.getExperiences = catchAsync(async (req, res) => {
 
   res.json({
     data,
-    hasMore,
-    isUpvotedByMe: exp.upvotes.some(id => id.toString() === userId),
-    isBookmarked: exp.bookmarks?.some(id => id.toString() === userId),
-    
+    hasMore, 
     nextCursor: experiences.length
       ? JSON.stringify({
           createdAt: experiences[experiences.length - 1].createdAt,
