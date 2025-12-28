@@ -45,7 +45,6 @@ export default function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/oauth-success" element={<OAuthSuccess />} />
-            <Route path="/app/feed" element={<Feed />} />
 
           {/*  PUBLIC 404 */}
           <Route path="*" element={<NotFound />} />
@@ -54,6 +53,7 @@ export default function App() {
         {/*  PROTECTED ROUTES */}
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
+            <Route path="/app/feed" element={<Feed />} />
             <Route path="/app/leaderboard" element={<Leaderboard />} />
             <Route path="/app/forum" element={<Forum />} />
             <Route path="/bookmarks" element={<Bookmarks />} />
